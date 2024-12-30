@@ -7,11 +7,14 @@ import (
 	"log"
 )
 
+const version = "0.0.1"
+
 func main() {
 
 	var cfg config
 
 	flag.StringVar(&cfg.addr, "addr", ":9080", "Server addr to listen on")
+	flag.StringVar(&cfg.env, "environment", "development", "Environment")
 	flag.StringVar(&cfg.db.dsn, "dsn", "host=localhost port=5432 user=postgres password=password dbname=social sslmode=disable", "DSN (Data Source Name)")
 	flag.IntVar(&cfg.db.maxOpenConn, "dbmaxconn", 10, "Max Open Connections")
 	flag.IntVar(&cfg.db.maxIdleConn, "dbidleconn", 5, "Max Idle Connections")

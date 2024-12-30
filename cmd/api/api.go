@@ -12,6 +12,7 @@ import (
 type config struct {
 	addr string
 	db   dbConfig
+	env  string
 }
 
 type dbConfig struct {
@@ -55,7 +56,7 @@ func (app *application) run(mux http.Handler) error {
 		IdleTimeout:  time.Minute,
 	}
 
-	log.Printf("Server started on %s", app.config.addr)
+	log.Printf("Server started in %s mode on port %s", app.config.env, app.config.addr)
 
 	return srv.ListenAndServe()
 }

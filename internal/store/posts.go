@@ -8,12 +8,12 @@ import (
 
 type Post struct {
 	ID        int64     `json:"id"`
-	Content   string    `json:"content"`
 	Title     string    `json:"title"`
+	Content   string    `json:"content"`
 	UserID    int64     `json:"user_id"`
-	Tags      []string  `json:"tags"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Tags      string    `json:"tags"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
 }
 
 type PostStore struct {
@@ -29,8 +29,8 @@ func (s *PostStore) Create(ctx context.Context, post *Post) error {
 	err := s.db.QueryRowContext(ctx, query,
 		post.Content,
 		post.Title,
-		post.UpdatedAt,
-		post.Tags, //TODO might fail and require conversion to array
+		post.UserID,
+		post.Tags,
 	).Scan(
 		&post.ID,
 		&post.CreatedAt,

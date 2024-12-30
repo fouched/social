@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 type UserStore struct {
@@ -10,12 +11,12 @@ type UserStore struct {
 }
 
 type User struct {
-	ID        int64  `json:"id"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	Password  string `json:"-"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	ID        int64     `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Password  string    `json:"-"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
 }
 
 func (s *UserStore) Create(ctx context.Context, user *User) error {
@@ -37,6 +38,6 @@ func (s *UserStore) Create(ctx context.Context, user *User) error {
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }

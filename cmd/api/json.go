@@ -12,7 +12,7 @@ func writeJSON(w http.ResponseWriter, status int, data any) error {
 	return json.NewEncoder(w).Encode(data)
 }
 
-func readKSON(w http.ResponseWriter, r *http.Request, data any) error {
+func readJSON(w http.ResponseWriter, r *http.Request, data any) error {
 	maxBytes := 1048578 // 1MB
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 

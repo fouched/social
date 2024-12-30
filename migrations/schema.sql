@@ -42,8 +42,9 @@ SET default_table_access_method = heap;
 CREATE TABLE public.posts (
     id bigint NOT NULL,
     user_id bigint NOT NULL,
-    title text NOT NULL,
+    title character varying(128) NOT NULL,
     content text NOT NULL,
+    tags character varying(128) DEFAULT ''::character varying NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL
 );

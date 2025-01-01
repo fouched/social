@@ -2,8 +2,16 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/go-playground/validator/v10"
 	"net/http"
 )
+
+var Validate *validator.Validate
+
+// init is a special function that runs when the application starts
+func init() {
+	Validate = validator.New(validator.WithRequiredStructEnabled())
+}
 
 func writeJSON(w http.ResponseWriter, status int, data any) error {
 	w.Header().Set("Content-Type", "application/json")

@@ -9,6 +9,7 @@ import (
 
 const version = "0.0.1"
 
+// main reads application flags and runs the application
 func main() {
 
 	var cfg config

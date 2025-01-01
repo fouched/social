@@ -13,6 +13,7 @@ func init() {
 	Validate = validator.New(validator.WithRequiredStructEnabled())
 }
 
+// writeJSON writes JSON to the ResponseWriter
 func writeJSON(w http.ResponseWriter, status int, data any) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
@@ -20,6 +21,7 @@ func writeJSON(w http.ResponseWriter, status int, data any) error {
 	return json.NewEncoder(w).Encode(data)
 }
 
+// readJSON reads JSON from the http request
 func readJSON(w http.ResponseWriter, r *http.Request, data any) error {
 	maxBytes := 1048578 // 1MB
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
@@ -30,6 +32,7 @@ func readJSON(w http.ResponseWriter, r *http.Request, data any) error {
 	return decoder.Decode(data)
 }
 
+// writeJSONError writes an error JSON return value
 func writeJSONError(w http.ResponseWriter, status int, message string) error {
 	type envelope struct {
 		Error string `json:"error"`

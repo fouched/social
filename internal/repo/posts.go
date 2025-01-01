@@ -21,6 +21,7 @@ type PostsRepo struct {
 	db *sql.DB
 }
 
+// CreatePost creates a post in the database
 func (r *PostsRepo) CreatePost(post *Post) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
@@ -47,6 +48,7 @@ func (r *PostsRepo) CreatePost(post *Post) error {
 	return nil
 }
 
+// GetPostById retrieves a post from the database by ID
 func (r *PostsRepo) GetPostById(id int64) (*Post, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()

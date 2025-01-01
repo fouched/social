@@ -26,6 +26,7 @@ type application struct {
 	repo   repo.Repository
 }
 
+// mount initializes the router and defines it paths
 func (app *application) mount() http.Handler {
 	r := chi.NewRouter()
 
@@ -54,6 +55,7 @@ func (app *application) mount() http.Handler {
 	return r
 }
 
+// run runs the application
 func (app *application) run(mux http.Handler) error {
 
 	srv := http.Server{

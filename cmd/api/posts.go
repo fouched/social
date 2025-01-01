@@ -15,6 +15,7 @@ type CreatePostPayload struct {
 	Tags    string `json:"tags"`
 }
 
+// createPost creates a new post and returns the resource
 func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
 	var payload CreatePostPayload
 	if err := readJSON(w, r, &payload); err != nil {
@@ -45,6 +46,7 @@ func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getPost retrieves a post by id
 func (app *application) getPost(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {

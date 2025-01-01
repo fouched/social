@@ -1,16 +1,24 @@
 package repo
 
 import (
-	"context"
 	"database/sql"
+	"errors"
+	"time"
+)
+
+const dbTimeout = time.Second * 60
+
+var (
+	ErrNotFound = errors.New("record not found")
 )
 
 type Repository struct {
 	Posts interface {
-		Create(context.Context, *Post) error
+		Create(*Post) error
+		GetById(int64) (*Post, error)
 	}
 	Users interface {
-		Create(context.Context, *User) error
+		Create(*User) error
 	}
 }
 

@@ -19,7 +19,9 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func (r *UsersRepo) Create(ctx context.Context, user *User) error {
+func (r *UsersRepo) Create(user *User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
 
 	query := `
 		insert into users(username, password, email) 

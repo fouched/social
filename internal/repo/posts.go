@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 )
 
@@ -20,7 +21,10 @@ type PostsRepo struct {
 	db *sql.DB
 }
 
-func (r *PostsRepo) Create(ctx context.Context, post *Post) error {
+func (r *PostsRepo) Create(post *Post) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
 	query := `
 		insert into posts (content, title, user_id, tags)
 		values ($1, $2, $3, $4) returning id, created_at, updated_at
@@ -41,4 +45,34 @@ func (r *PostsRepo) Create(ctx context.Context, post *Post) error {
 	}
 
 	return nil
+}
+
+func (r *PostsRepo) GetById(id int64) (*Post, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `
+		select id, user_id, title, content, tags, created_at, updated_at 
+		from posts
+		where id = $1
+	`
+	var post Post
+	err := r.db.QueryRowContext(ctx, query, id).Scan(
+		&post.ID,
+		&post.UserID,
+		&post.Title,
+		&post.Content,
+		&post.Tags,
+		&post.CreatedAt,
+		&post.UpdatedAt,
+	)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrNotFound
+		default:
+			return nil, err
+		}
+	}
+	return &post, nil
 }

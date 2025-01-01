@@ -28,7 +28,7 @@ func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
 		UserID:  1,
 	}
 
-	if err := app.repo.Posts.Create(post); err != nil {
+	if err := app.repo.Posts.CreatePost(post); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
@@ -46,7 +46,7 @@ func (app *application) getPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post, err := app.repo.Posts.GetById(id)
+	post, err := app.repo.Posts.GetPostById(id)
 	if err != nil {
 		switch {
 		case errors.Is(err, repo.ErrNotFound):

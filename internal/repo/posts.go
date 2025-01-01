@@ -21,7 +21,7 @@ type PostsRepo struct {
 	db *sql.DB
 }
 
-func (r *PostsRepo) Create(post *Post) error {
+func (r *PostsRepo) CreatePost(post *Post) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -47,7 +47,7 @@ func (r *PostsRepo) Create(post *Post) error {
 	return nil
 }
 
-func (r *PostsRepo) GetById(id int64) (*Post, error) {
+func (r *PostsRepo) GetPostById(id int64) (*Post, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 

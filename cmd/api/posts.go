@@ -14,7 +14,7 @@ type CreatePostPayload struct {
 	Tags    string `json:"tags"`
 }
 
-func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
 	var payload CreatePostPayload
 	if err := readJSON(w, r, &payload); err != nil {
 		app.badRequest(w, r, err)
@@ -39,7 +39,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) getPost(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
 		app.badRequest(w, r, err)

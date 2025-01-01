@@ -14,8 +14,8 @@ var (
 
 type Repository struct {
 	Posts interface {
-		Create(*Post) error
-		GetById(int64) (*Post, error)
+		CreatePost(*Post) error
+		GetPostById(int64) (*Post, error)
 	}
 	Users interface {
 		Create(*User) error

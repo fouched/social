@@ -1,11 +1,11 @@
-package store
+package repo
 
 import (
 	"context"
 	"database/sql"
 )
 
-type Storage struct {
+type Repository struct {
 	Posts interface {
 		Create(context.Context, *Post) error
 	}
@@ -14,9 +14,9 @@ type Storage struct {
 	}
 }
 
-func NewStorage(db *sql.DB) Storage {
-	return Storage{
-		Posts: &PostStore{db},
-		Users: &UserStore{db},
+func NewRepository(db *sql.DB) Repository {
+	return Repository{
+		Posts: &PostsRepo{db},
+		Users: &UsersRepo{db},
 	}
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/fouched/social/internal/db"
-	"github.com/fouched/social/internal/store"
+	"github.com/fouched/social/internal/repo"
 	"log"
 )
 
@@ -16,8 +16,8 @@ func main() {
 	flag.StringVar(&cfg.addr, "addr", ":9080", "Server addr to listen on")
 	flag.StringVar(&cfg.env, "environment", "development", "Environment")
 	flag.StringVar(&cfg.db.dsn, "dsn", "host=localhost port=5432 user=postgres password=password dbname=social sslmode=disable", "DSN (Data Source Name)")
-	flag.IntVar(&cfg.db.maxOpenConn, "dbmaxconn", 10, "Max Open Connections")
-	flag.IntVar(&cfg.db.maxIdleConn, "dbidleconn", 5, "Max Idle Connections")
+	flag.IntVar(&cfg.db.maxOpenConn, "dbmaxconn", 10, "Max Open DB Connections")
+	flag.IntVar(&cfg.db.maxIdleConn, "dbconsole", 5, "Max Idle DB Connections")
 
 	dbPool, err := db.New(
 		cfg.db.dsn,
@@ -29,13 +29,13 @@ func main() {
 	}
 	// we have database connectivity, close it after app stops
 	defer dbPool.Close()
-	log.Print("DB connected")
+	log.Println("DB connected")
 
-	storage := store.NewStorage(dbPool)
+	repository := repo.NewRepository(dbPool)
 
 	app := &application{
-		config:  cfg,
-		storage: storage,
+		config: cfg,
+		repo:   repository,
 	}
 
 	mux := app.mount()

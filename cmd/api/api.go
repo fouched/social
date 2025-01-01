@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/fouched/social/internal/store"
+	"github.com/fouched/social/internal/repo"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"log"
@@ -22,8 +22,8 @@ type dbConfig struct {
 }
 
 type application struct {
-	config  config
-	storage store.Storage
+	config config
+	repo   repo.Repository
 }
 
 func (app *application) mount() http.Handler {

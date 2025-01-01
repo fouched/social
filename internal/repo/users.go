@@ -1,4 +1,4 @@
-package store
+package repo
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type UserStore struct {
+type UsersRepo struct {
 	db *sql.DB
 }
 
@@ -19,14 +19,14 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func (s *UserStore) Create(ctx context.Context, user *User) error {
+func (r *UsersRepo) Create(ctx context.Context, user *User) error {
 
 	query := `
 		insert into users(username, password, email) 
 		values($1, $2, $3) returning id, created_at, updated_at
 	`
 
-	err := s.db.QueryRowContext(ctx, query,
+	err := r.db.QueryRowContext(ctx, query,
 		&user.Username,
 		&user.Password,
 		&user.Email,

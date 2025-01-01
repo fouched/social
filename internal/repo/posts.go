@@ -1,4 +1,4 @@
-package store
+package repo
 
 import (
 	"context"
@@ -16,17 +16,17 @@ type Post struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type PostStore struct {
+type PostsRepo struct {
 	db *sql.DB
 }
 
-func (s *PostStore) Create(ctx context.Context, post *Post) error {
+func (r *PostsRepo) Create(ctx context.Context, post *Post) error {
 	query := `
 		insert into posts (content, title, user_id, tags)
 		values ($1, $2, $3, $4) returning id, created_at, updated_at
 	`
 
-	err := s.db.QueryRowContext(ctx, query,
+	err := r.db.QueryRowContext(ctx, query,
 		post.Content,
 		post.Title,
 		post.UserID,

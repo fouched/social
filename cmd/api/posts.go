@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/fouched/social/internal/store"
+	"github.com/fouched/social/internal/repo"
 	"net/http"
 )
 
@@ -18,7 +18,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	post := &store.Post{
+	post := &repo.Post{
 		Title:   payload.Title,
 		Content: payload.Content,
 		Tags:    payload.Tags,
@@ -26,7 +26,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	ctx := r.Context()
-	if err := app.storage.Posts.Create(ctx, post); err != nil {
+	if err := app.repo.Posts.Create(ctx, post); err != nil {
 		_ = writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}

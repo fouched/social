@@ -49,6 +49,52 @@ func (r *PostsRepo) CreatePost(post *Post) error {
 	return nil
 }
 
+// UpdatePost creates a post in the database
+func (r *PostsRepo) UpdatePost(post *Post) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `
+		update posts 
+		set content = $1, 
+		    title = $2, 
+		    tags = $3,
+			updated_at = $4
+		where id = $5
+	`
+
+	_, err := r.db.ExecContext(ctx, query,
+		post.Content,
+		post.Title,
+		post.Tags,
+		time.Now(),
+		post.ID,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeletePost creates a post in the database
+func (r *PostsRepo) DeletePost(id int64) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `
+		delete from posts 
+		where id = $1
+	`
+
+	_, err := r.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // GetPostById retrieves a post from the database by ID
 func (r *PostsRepo) GetPostById(id int64) (*Post, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)

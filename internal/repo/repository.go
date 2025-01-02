@@ -16,6 +16,8 @@ type Repository struct {
 	Posts interface {
 		CreatePost(*Post) error
 		GetPostById(int64) (*Post, error)
+		UpdatePost(*Post) error
+		DeletePost(int64) error
 	}
 	Comments interface {
 		GetCommentsByPostId(int64) (*[]Comment, error)

@@ -17,6 +17,9 @@ type Repository struct {
 		CreatePost(*Post) error
 		GetPostById(int64) (*Post, error)
 	}
+	Comments interface {
+		GetCommentsByPostId(int64) (*[]Comment, error)
+	}
 	Users interface {
 		Create(*User) error
 	}
@@ -24,7 +27,8 @@ type Repository struct {
 
 func NewRepository(db *sql.DB) Repository {
 	return Repository{
-		Posts: &PostsRepo{db},
-		Users: &UsersRepo{db},
+		Posts:    &PostsRepo{db},
+		Comments: &CommentsRepo{db},
+		Users:    &UsersRepo{db},
 	}
 }

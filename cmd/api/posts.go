@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"github.com/fouched/social/internal/repo"
 	"github.com/go-chi/chi/v5"
@@ -20,6 +21,10 @@ type UpdatePostPayload struct {
 	Content *string `json:"content" validate:"omitempty,max=2000"`
 	Tags    *string `json:"tags" validate:"omitempty,max=128"`
 }
+
+type postKey string
+
+const postCtx postKey = "post"
 
 // createPost creates a new post and returns the resource
 func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
@@ -54,24 +59,9 @@ func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
 
 // getPost retrieves a post by id
 func (app *application) getPost(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	if err != nil {
-		app.badRequest(w, r, err)
-		return
-	}
+	post := getPostFromContext(r)
 
-	post, err := app.repo.Posts.GetPostById(id)
-	if err != nil {
-		switch {
-		case errors.Is(err, repo.ErrNotFound):
-			app.notFound(w, r, err)
-		default:
-			app.internalServerError(w, r, err)
-		}
-		return
-	}
-
-	comments, err := app.repo.Comments.GetCommentsByPostId(id)
+	comments, err := app.repo.Comments.GetCommentsByPostId(post.ID)
 	if err != nil {
 		app.internalServerError(w, r, err)
 	}
@@ -86,18 +76,7 @@ func (app *application) getPost(w http.ResponseWriter, r *http.Request) {
 
 // updatePost retrieves a post by id
 func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	if err != nil {
-		app.badRequest(w, r, err)
-		return
-	}
-
-	// retrieve resource to be updated
-	post, err := app.repo.Posts.GetPostById(id)
-	if err != nil {
-		app.notFound(w, r, err)
-		return
-	}
+	post := getPostFromContext(r)
 
 	// read payload, validate and update
 	var payload UpdatePostPayload
@@ -127,7 +106,7 @@ func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//set the previous comments
-	comments, err := app.repo.Comments.GetCommentsByPostId(id)
+	comments, err := app.repo.Comments.GetCommentsByPostId(post.ID)
 	if err != nil {
 		app.internalServerError(w, r, err)
 		return
@@ -142,17 +121,46 @@ func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) deletePost(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	if err != nil {
-		app.badRequest(w, r, err)
-		return
-	}
+	post := getPostFromContext(r)
 
-	err = app.repo.Posts.DeletePost(id)
+	err := app.repo.Posts.DeletePost(post.ID)
 	if err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (app *application) postsContextMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+		if err != nil {
+			app.badRequest(w, r, err)
+			return
+		}
+
+		ctx := r.Context()
+
+		post, err := app.repo.Posts.GetPostById(id)
+		if err != nil {
+			switch {
+			case errors.Is(err, repo.ErrNotFound):
+				app.notFound(w, r, err)
+			default:
+				app.internalServerError(w, r, err)
+			}
+			return
+		}
+
+		// never mutate a context always create a new one
+		ctx = context.WithValue(ctx, postCtx, post)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func getPostFromContext(r *http.Request) *repo.Post {
+	// cast to appropriate type
+	post, _ := r.Context().Value(postCtx).(*repo.Post)
+	return post
 }

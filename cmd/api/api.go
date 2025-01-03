@@ -47,6 +47,9 @@ func (app *application) mount() http.Handler {
 			r.Post("/", app.createPost)
 
 			r.Route("/{id}", func(r chi.Router) {
+				// use middleware to retrieve post for all operations
+				r.Use(app.postsContextMiddleware)
+				
 				r.Get("/", app.getPost)
 				r.Patch("/", app.updatePost)
 				r.Delete("/", app.deletePost)

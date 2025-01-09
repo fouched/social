@@ -16,7 +16,7 @@ type SendGridMailer struct {
 	client    *sendgrid.Client
 }
 
-func NewSendgrid(apiKey, fromEmail string) *SendGridMailer {
+func NewSendgridClient(apiKey, fromEmail string) *SendGridMailer {
 	client := sendgrid.NewSendClient(apiKey)
 
 	return &SendGridMailer{

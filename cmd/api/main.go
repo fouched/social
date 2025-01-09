@@ -41,8 +41,8 @@ func main() {
 	flag.IntVar(&cfg.db.maxOpenConn, "dbmaxconn", 10, "Max Open DB Connections")
 	flag.IntVar(&cfg.db.maxIdleConn, "dbconsole", 5, "Max Idle DB Connections")
 	flag.DurationVar(&cfg.mail.expiry, "expiry", time.Hour*24*3, "Registration Expiry")
-	flag.StringVar(&cfg.mail.sendGrid.apiKey, "sendgridApiKey", "", "SendGrid API Key")
 	flag.StringVar(&cfg.mail.fromEmail, "fromEmail", "fouche@limehouse.co.za", "From email")
+	flag.StringVar(&cfg.mail.sendgrid.apiKey, "sendgridApiKey", "", "SendGrid API Key")
 
 	// Logger
 	logger := zap.Must(zap.NewProduction()).Sugar()
@@ -66,7 +66,7 @@ func main() {
 
 	//seed(repository)
 
-	mailerImpl := mailer.NewSendgrid(cfg.mail.sendGrid.apiKey, cfg.mail.fromEmail)
+	mailerImpl := mailer.NewSendgridClient(cfg.mail.sendgrid.apiKey, cfg.mail.fromEmail)
 
 	app := &application{
 		config: cfg,

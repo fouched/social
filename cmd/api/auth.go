@@ -84,7 +84,7 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 		Username:      user.Username,
 		ActivationURL: activationURL,
 	}
-	//send email
+	//send email - below is synchronous, for high volumes will need to impl async / a queueing system
 	status, err := app.mailer.Send(mailer.UserWelcomeTemplate, user.Username, user.Email, vars, !isProdEnv)
 	if err != nil {
 		app.logger.Errorw("error sending welcome email", "error", err)

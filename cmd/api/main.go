@@ -35,7 +35,7 @@ func main() {
 
 	flag.StringVar(&cfg.addr, "addr", ":9080", "Server addr to listen on")
 	flag.StringVar(&cfg.apiURL, "apiURL", "localhost:9080", "External API URL")
-	flag.StringVar(&cfg.frontendURL, "frontendURL", "http://localhost:4000", "External Frontend URL")
+	flag.StringVar(&cfg.frontendURL, "frontendURL", "http://localhost:5173", "External Frontend URL")
 	flag.StringVar(&cfg.env, "environment", "development", "Environment")
 	flag.StringVar(&cfg.db.dsn, "dsn", "host=localhost port=5432 user=postgres password=password dbname=social sslmode=disable", "DSN (Data Source Name)")
 	flag.IntVar(&cfg.db.maxOpenConn, "dbmaxconn", 10, "Max Open DB Connections")

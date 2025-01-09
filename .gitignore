@@ -24,7 +24,7 @@ go.work.sum
 .idea
 bin
 db-data
-#docs
+docs
 web/node_modules
 
 

@@ -23,3 +23,9 @@ func (app *application) concurrentModification(w http.ResponseWriter, r *http.Re
 	app.logger.Errorw("concurrent modification", "method", r.Method, "path", r.URL.Path, "error", err)
 	_ = writeJSONError(w, http.StatusConflict, "concurrent modification error")
 }
+
+func (app *application) unauthorizedBasicAuth(w http.ResponseWriter, r *http.Request, err error) {
+	app.logger.Infow("Unauthorized basic auth", "method", r.Method, "path", r.URL.Path, "error", err)
+	w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
+	_ = writeJSONError(w, http.StatusUnauthorized, "Unauthorized basic auth")
+}

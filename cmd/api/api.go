@@ -17,9 +17,10 @@ import (
 type config struct {
 	addr        string
 	db          dbConfig
+	mail        mailConfig
+	auth        authConfig
 	env         string
 	apiURL      string
-	mail        mailConfig
 	mailer      mailer.Client
 	frontendURL string
 }
@@ -43,6 +44,15 @@ type dbConfig struct {
 	dsn         string
 	maxOpenConn int
 	maxIdleConn int
+}
+
+type authConfig struct {
+	basic basicConfig
+}
+
+type basicConfig struct {
+	user string
+	pass string
 }
 
 type application struct {
@@ -78,7 +88,7 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Route("/v1", func(r chi.Router) {
-		r.Get("/health", app.healthCheckHandler)
+		r.With(app.BasicAuthMiddleware()).Get("/health", app.healthCheckHandler)
 
 		// Public route
 		r.Route("/authentication", func(r chi.Router) {

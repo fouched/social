@@ -43,6 +43,8 @@ func main() {
 	flag.DurationVar(&cfg.mail.expiry, "expiry", time.Hour*24*3, "Registration Expiry")
 	flag.StringVar(&cfg.mail.fromEmail, "fromEmail", "fouche@limehouse.co.za", "From email")
 	flag.StringVar(&cfg.mail.sendgrid.apiKey, "sendgridApiKey", "", "SendGrid API Key")
+	flag.StringVar(&cfg.auth.basic.user, "basicAuthUser", "admin", "Basic auth user")
+	flag.StringVar(&cfg.auth.basic.pass, "basicAuthPass", "admin", "Basic auth pass")
 
 	// Logger
 	logger := zap.Must(zap.NewProduction()).Sugar()

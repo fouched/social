@@ -148,7 +148,7 @@ func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 		post.Tags = *payload.Tags
 	}
 
-	if err := app.repo.Posts.Update(post); err != nil {
+	if err := app.repo.Posts.Update(&post); err != nil {
 		switch {
 		case errors.Is(err, repo.ErrNotFound):
 			app.concurrentModification(w, r, err)

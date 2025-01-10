@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/fouched/social/internal/auth"
 	"github.com/fouched/social/internal/db"
 	"github.com/fouched/social/internal/mailer"
 	"github.com/fouched/social/internal/repo"
@@ -45,6 +46,9 @@ func main() {
 	flag.StringVar(&cfg.mail.sendgrid.apiKey, "sendgridApiKey", "", "SendGrid API Key")
 	flag.StringVar(&cfg.auth.basic.user, "basicAuthUser", "admin", "Basic auth user")
 	flag.StringVar(&cfg.auth.basic.pass, "basicAuthPass", "admin", "Basic auth pass")
+	flag.StringVar(&cfg.auth.token.secret, "tokenSecret", "example", "Token secret")
+	flag.DurationVar(&cfg.auth.token.exp, "tokenExpiry", time.Hour*24*3, "Token expiry duration")
+	flag.StringVar(&cfg.auth.token.issuer, "tokenIssuer", "gophersocial", "Token issuer")
 
 	// Logger
 	logger := zap.Must(zap.NewProduction()).Sugar()
@@ -70,11 +74,18 @@ func main() {
 
 	mailerImpl := mailer.NewSendgridClient(cfg.mail.sendgrid.apiKey, cfg.mail.fromEmail)
 
+	jwtAuthenticator := auth.NewJWTAuthenticator(
+		cfg.auth.token.secret,
+		cfg.auth.token.issuer,
+		cfg.auth.token.issuer,
+	)
+
 	app := &application{
-		config: cfg,
-		repo:   repository,
-		logger: logger,
-		mailer: mailerImpl,
+		config:        cfg,
+		repo:          repository,
+		logger:        logger,
+		mailer:        mailerImpl,
+		authenticator: jwtAuthenticator,
 	}
 
 	mux := app.mount()

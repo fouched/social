@@ -58,7 +58,7 @@ func (r *PostsRepo) Create(post *Post) error {
 }
 
 // Update updates a post in the database
-func (r *PostsRepo) Update(post Post) error {
+func (r *PostsRepo) Update(post *Post) error {
 	ctx, cancel := context.WithTimeout(context.Background(), DbTimeout)
 	defer cancel()
 
@@ -113,7 +113,7 @@ func (r *PostsRepo) Delete(id int64) error {
 }
 
 // GetById retrieves a post from the database by ID
-func (r *PostsRepo) GetById(id int64) (Post, error) {
+func (r *PostsRepo) GetById(id int64) (*Post, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DbTimeout)
 	defer cancel()
 
@@ -139,12 +139,12 @@ func (r *PostsRepo) GetById(id int64) (Post, error) {
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return post, ErrNotFound
+			return &post, ErrNotFound
 		default:
-			return post, err
+			return &post, err
 		}
 	}
-	return post, nil
+	return &post, nil
 }
 
 func (r *PostsRepo) GetUserFeed(userId int64, pq PaginatedQuery) ([]PostFeed, error) {

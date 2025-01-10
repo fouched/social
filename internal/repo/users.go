@@ -44,7 +44,7 @@ func (p *password) Set(text string) error {
 	return nil
 }
 
-func (r *UsersRepo) GetById(id int64) (User, error) {
+func (r *UsersRepo) GetById(id int64) (*User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DbTimeout)
 	defer cancel()
 
@@ -52,25 +52,56 @@ func (r *UsersRepo) GetById(id int64) (User, error) {
 		select id, email, username, password, created_at, updated_at 
 		from users
 		where id = $1
+		and is_active = true
 	`
 	user := User{}
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
 		&user.ID,
 		&user.Email,
 		&user.Username,
-		&user.Password,
+		&user.Password.hash,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return user, ErrNotFound
+			return &user, ErrNotFound
 		default:
-			return user, err
+			return &user, err
 		}
 	}
-	return user, nil
+	return &user, nil
+}
+
+func (r *UsersRepo) GetByEmail(email string) (*User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), DbTimeout)
+	defer cancel()
+
+	query := `
+		select id, email, username, password, created_at, updated_at 
+		from users
+		where email = $1
+		and is_active = true
+	`
+	user := User{}
+	err := r.db.QueryRowContext(ctx, query, email).Scan(
+		&user.ID,
+		&user.Email,
+		&user.Username,
+		&user.Password.hash,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return &user, ErrNotFound
+		default:
+			return &user, err
+		}
+	}
+	return &user, nil
 }
 
 func (r *UsersRepo) CreateAndInvite(user *User, token string, expiry time.Duration) error {

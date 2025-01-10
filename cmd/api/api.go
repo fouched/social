@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/fouched/social/docs" // required for swagger docs
+	"github.com/fouched/social/internal/auth"
 	"github.com/fouched/social/internal/mailer"
 	"github.com/fouched/social/internal/repo"
 	"github.com/go-chi/chi/v5"
@@ -48,6 +49,7 @@ type dbConfig struct {
 
 type authConfig struct {
 	basic basicConfig
+	token tokenConfig
 }
 
 type basicConfig struct {
@@ -55,11 +57,18 @@ type basicConfig struct {
 	pass string
 }
 
+type tokenConfig struct {
+	secret string
+	exp    time.Duration
+	issuer string
+}
+
 type application struct {
-	config config
-	repo   repo.Repository
-	logger *zap.SugaredLogger
-	mailer mailer.Client
+	config        config
+	repo          repo.Repository
+	logger        *zap.SugaredLogger
+	mailer        mailer.Client
+	authenticator auth.Authenticator //abstract authentication mechanism so that we can easily use another
 }
 
 // mount initializes the router and defines it paths
@@ -90,9 +99,10 @@ func (app *application) mount() http.Handler {
 	r.Route("/v1", func(r chi.Router) {
 		r.With(app.BasicAuthMiddleware()).Get("/health", app.healthCheckHandler)
 
-		// Public route
+		// Public routes
 		r.Route("/authentication", func(r chi.Router) {
 			r.Post("/user", app.registerUser)
+			r.Post("/token", app.createToken)
 		})
 
 		docsURL := fmt.Sprintf("%s/swagger/doc.json", app.config.addr)

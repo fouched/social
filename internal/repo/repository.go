@@ -15,8 +15,8 @@ var (
 type Repository struct {
 	Posts interface {
 		Create(*Post) error
-		GetById(int64) (Post, error)
-		Update(Post) error
+		GetById(int64) (*Post, error)
+		Update(*Post) error
 		Delete(int64) error
 		GetUserFeed(int64, PaginatedQuery) ([]PostFeed, error)
 	}
@@ -26,7 +26,8 @@ type Repository struct {
 	}
 	Users interface {
 		CreateAndInvite(user *User, token string, expiry time.Duration) error
-		GetById(int64) (User, error)
+		GetById(int64) (*User, error)
+		GetByEmail(string) (*User, error)
 		Activate(string) error
 		Delete(int64) error
 	}

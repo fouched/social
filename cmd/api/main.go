@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/fouched/social/internal/auth"
-	"github.com/fouched/social/internal/db"
+	"github.com/fouched/social/internal/driver"
 	"github.com/fouched/social/internal/mailer"
 	"github.com/fouched/social/internal/repo"
 	"go.uber.org/zap"
@@ -56,7 +56,7 @@ func main() {
 	logger.Info("Starting app...")
 
 	// Database
-	dbPool, err := db.New(
+	dbPool, err := driver.New(
 		cfg.db.dsn,
 		cfg.db.maxOpenConn,
 		cfg.db.maxIdleConn,

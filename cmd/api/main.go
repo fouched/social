@@ -88,7 +88,7 @@ func main() {
 		authenticator: jwtAuthenticator,
 	}
 
-	mux := app.mount()
+	mux := app.routes()
 	logger.Fatal(app.run(mux))
 }
 

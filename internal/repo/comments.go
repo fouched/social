@@ -20,7 +20,7 @@ type CommentsRepo struct {
 	db *sql.DB
 }
 
-func (r *CommentsRepo) GetByPostId(id int64) ([]Comment, error) {
+func (r *CommentsRepo) GetByPostId(id int64) (*[]Comment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DbTimeout)
 	defer cancel()
 
@@ -50,7 +50,7 @@ func (r *CommentsRepo) GetByPostId(id int64) ([]Comment, error) {
 		}
 		comments = append(comments, c)
 	}
-	return comments, nil
+	return &comments, nil
 }
 
 func (r *CommentsRepo) Create(comment *Comment) error {

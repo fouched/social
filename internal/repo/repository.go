@@ -18,11 +18,11 @@ type Repository struct {
 		GetById(int64) (*Post, error)
 		Update(*Post) error
 		Delete(int64) error
-		GetUserFeed(int64, PaginatedQuery) ([]PostFeed, error)
+		GetUserFeed(int64, PaginatedQuery) (*[]PostFeed, error)
 	}
 	Comments interface {
 		Create(*Comment) error
-		GetByPostId(int64) ([]Comment, error)
+		GetByPostId(int64) (*[]Comment, error)
 	}
 	Users interface {
 		CreateAndInvite(user *User, token string, expiry time.Duration) error

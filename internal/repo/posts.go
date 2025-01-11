@@ -9,16 +9,16 @@ import (
 )
 
 type Post struct {
-	ID        int64     `json:"id"`
-	Title     string    `json:"title"`
-	Content   string    `json:"content"`
-	UserID    int64     `json:"user_id"`
-	Tags      string    `json:"tags"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Comments  []Comment `json:"comments"`
-	User      User      `json:"user"`
-	Version   int       `json:"version"`
+	ID        int64      `json:"id"`
+	Title     string     `json:"title"`
+	Content   string     `json:"content"`
+	UserID    int64      `json:"user_id"`
+	Tags      string     `json:"tags"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	Comments  *[]Comment `json:"comments"`
+	User      User       `json:"user"`
+	Version   int        `json:"version"`
 }
 
 type PostFeed struct {
@@ -147,7 +147,7 @@ func (r *PostsRepo) GetById(id int64) (*Post, error) {
 	return &post, nil
 }
 
-func (r *PostsRepo) GetUserFeed(userId int64, pq PaginatedQuery) ([]PostFeed, error) {
+func (r *PostsRepo) GetUserFeed(userId int64, pq PaginatedQuery) (*[]PostFeed, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DbTimeout)
 	defer cancel()
 
@@ -203,5 +203,5 @@ func (r *PostsRepo) GetUserFeed(userId int64, pq PaginatedQuery) ([]PostFeed, er
 		feed = append(feed, pf)
 	}
 
-	return feed, nil
+	return &feed, nil
 }

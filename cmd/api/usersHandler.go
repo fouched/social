@@ -163,7 +163,7 @@ func (app *application) userContextMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func getUserFromContext(r *http.Request) repo.User {
-	user, _ := r.Context().Value(userCtx).(repo.User)
+func getUserFromContext(r *http.Request) *repo.User {
+	user, _ := r.Context().Value(userCtx).(*repo.User)
 	return user
 }

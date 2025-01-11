@@ -1,6 +1,9 @@
 package auth
 
-import "github.com/golang-jwt/jwt/v5"
+import (
+	"errors"
+	"github.com/golang-jwt/jwt/v5"
+)
 
 type JWTAuthenticator struct {
 	secret   string
@@ -24,5 +27,15 @@ func (a *JWTAuthenticator) GenerateToken(claims jwt.Claims) (string, error) {
 }
 
 func (a *JWTAuthenticator) ValidateToken(token string) (*jwt.Token, error) {
-	return nil, nil
+	return jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("malformed token")
+		}
+		return []byte(a.secret), nil
+	},
+		jwt.WithExpirationRequired(),
+		jwt.WithAudience(a.audience),
+		jwt.WithIssuer(a.issuer),
+		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}),
+	)
 }

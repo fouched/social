@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"errors"
 	"github.com/fouched/social/internal/repo"
 	"github.com/go-chi/chi/v5"
@@ -53,17 +52,13 @@ type Follower struct {
 //	@Security		ApiKeyAuth
 //	@Router			/users/{userId}/follow [put]
 func (app *application) followUser(w http.ResponseWriter, r *http.Request) {
-	// this is the post of the user from the url path
-	followedUser := getUserFromContext(r)
-
-	//TODO use auth userID from ctx
-	var follower Follower
-	if err := readJSON(w, r, &follower); err != nil {
+	user := getUserFromContext(r)
+	followedID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
 		app.badRequest(w, r, err)
-		return
 	}
 
-	if err := app.repo.Followers.Follow(followedUser.ID, follower.UserID); err != nil {
+	if err := app.repo.Followers.Follow(followedID, user.ID); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
@@ -87,17 +82,13 @@ func (app *application) followUser(w http.ResponseWriter, r *http.Request) {
 //	@Security		ApiKeyAuth
 //	@Router			/users/{userId}/unfollow [put]
 func (app *application) unfollowUser(w http.ResponseWriter, r *http.Request) {
-	// this is the post of the user from the url path
-	followedUser := getUserFromContext(r)
-
-	//TODO use auth userID from ctx
-	var payload Follower
-	if err := readJSON(w, r, &payload); err != nil {
+	user := getUserFromContext(r)
+	followedID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
 		app.badRequest(w, r, err)
-		return
 	}
 
-	if err := app.repo.Followers.Unfollow(followedUser.ID, payload.UserID); err != nil {
+	if err := app.repo.Followers.Unfollow(followedID, user.ID); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
@@ -135,32 +126,6 @@ func (app *application) activateUser(w http.ResponseWriter, r *http.Request) {
 	if err := app.jsonResponse(w, http.StatusNoContent, ""); err != nil {
 		app.internalServerError(w, r, err)
 	}
-}
-
-func (app *application) userContextMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-		if err != nil {
-			app.badRequest(w, r, err)
-			return
-		}
-
-		user, err := app.repo.Users.GetById(id)
-		if err != nil {
-			switch {
-			case errors.Is(err, repo.ErrNotFound):
-				app.notFound(w, r, err)
-			default:
-				app.internalServerError(w, r, err)
-			}
-			return
-		}
-
-		ctx := r.Context()
-		// never mutate a context always create a new one
-		ctx = context.WithValue(ctx, userCtx, user)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
 }
 
 func getUserFromContext(r *http.Request) *repo.User {

@@ -58,11 +58,13 @@ func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user := getUserFromContext(r)
+
 	post := repo.Post{
 		Title:   payload.Title,
 		Content: payload.Content,
 		Tags:    payload.Tags,
-		UserID:  1,
+		UserID:  user.ID,
 	}
 
 	if err := app.repo.Posts.Create(&post); err != nil {

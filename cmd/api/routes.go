@@ -48,6 +48,8 @@ func (app *application) routes() http.Handler {
 		r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
 
 		r.Route("/posts", func(r chi.Router) {
+			r.Use(app.AuthTokenMiddleware)
+
 			r.Post("/", app.createPost)
 
 			r.Route("/{id}", func(r chi.Router) {
@@ -68,7 +70,7 @@ func (app *application) routes() http.Handler {
 
 			r.Route("/{id}", func(r chi.Router) {
 				// use middleware to retrieve user for all user handlers
-				r.Use(app.userContextMiddleware)
+				r.Use(app.AuthTokenMiddleware)
 
 				r.Get("/", app.getUser)
 
@@ -79,6 +81,7 @@ func (app *application) routes() http.Handler {
 			//Group adds a new inline-Router along the current routing path,
 			//with a fresh middleware stack for the inline-Router
 			r.Group(func(r chi.Router) {
+				r.Use(app.AuthTokenMiddleware)
 				r.Get("/feed", app.getUserFeed)
 			})
 		})

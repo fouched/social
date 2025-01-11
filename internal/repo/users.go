@@ -44,6 +44,10 @@ func (p *password) Set(text string) error {
 	return nil
 }
 
+func (p *password) Compare(text string) error {
+	return bcrypt.CompareHashAndPassword(p.hash, []byte(text))
+}
+
 func (r *UsersRepo) GetById(id int64) (*User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DbTimeout)
 	defer cancel()

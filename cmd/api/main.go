@@ -3,11 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/fouched/social/docs" // required for swagger docs
 	"github.com/fouched/social/internal/auth"
 	"github.com/fouched/social/internal/driver"
 	"github.com/fouched/social/internal/mailer"
 	"github.com/fouched/social/internal/repo"
 	"go.uber.org/zap"
+	"net/http"
 	"time"
 )
 
@@ -90,6 +92,26 @@ func main() {
 
 	mux := app.routes()
 	logger.Fatal(app.run(mux))
+}
+
+// run runs the application
+func (app *application) run(mux http.Handler) error {
+	//Docs
+	docs.SwaggerInfo.Version = version
+	docs.SwaggerInfo.Host = app.config.apiURL
+	docs.SwaggerInfo.BasePath = "/v1"
+
+	srv := http.Server{
+		Addr:         app.config.addr,
+		Handler:      mux,
+		WriteTimeout: time.Second * 30,
+		ReadTimeout:  time.Second * 10,
+		IdleTimeout:  time.Minute,
+	}
+
+	app.logger.Infow("Server started", "env", app.config.env, "addr", app.config.addr)
+
+	return srv.ListenAndServe()
 }
 
 func seed(repo repo.Repository) {

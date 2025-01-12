@@ -203,9 +203,8 @@ func (app *application) deletePost(w http.ResponseWriter, r *http.Request) {
 //	@Tags			posts
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		string	true	"Post ID"
-//	@Param			userID	query		string	true	"Commenting User ID"
-//	@Param			content	query		string	true	"Comment"
+//	@Param			id		path		string						true	"Post ID"
+//	@Param			payload	body		CreatePostCommentPayload	true	"Post comment payload"
 //	@Success		200		{object}	repo.Comment
 //	@Failure		400		{object}	error	"Bad Request"
 //	@Failure		500		{object}	error	"Server Error"
@@ -224,10 +223,11 @@ func (app *application) createPostComment(w http.ResponseWriter, r *http.Request
 	}
 
 	post := getPostFromContext(r)
+	user := getUserFromContext(r)
 
 	comment := repo.Comment{
 		PostID:  post.ID,
-		UserID:  1,
+		UserID:  user.ID,
 		Content: commentPayload.Content,
 	}
 

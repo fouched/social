@@ -45,8 +45,8 @@ func (app *application) getUserFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := int64(2) // hard code for now
-	feed, err := app.repo.Posts.GetUserFeed(userID, pq)
+	user := getUserFromContext(r)
+	feed, err := app.repo.Posts.GetUserFeed(user.ID, pq)
 	if err != nil {
 		app.internalServerError(w, r, err)
 		return

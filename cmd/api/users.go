@@ -100,17 +100,17 @@ func (app *application) unfollowUser(w http.ResponseWriter, r *http.Request) {
 
 // activateUser activates a user
 
-// @Summary		Activates a user
-// @Description	Activates a user
-// @Tags			users
-// @Accept			json
-// @Produce		json
-// @Param			token	path		string	true	"Invitation token"
-// @Success		204		{string}	string	"User activated"
-// @Failure		404		{object}	error	"Not found"
-// @Failure		500		{object}	error	"Server Error"
-// @Security		ApiKeyAuth
-// @Router			/users/activate/{token} [put]
+//	@Summary		Activates a user
+//	@Description	Activates a user
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			token	path		string	true	"Invitation token"
+//	@Success		204		{string}	string	"User activated"
+//	@Failure		404		{object}	error	"Not found"
+//	@Failure		500		{object}	error	"Server Error"
+//	@Security		ApiKeyAuth
+//	@Router			/users/activate/{token} [put]
 func (app *application) activateUser(w http.ResponseWriter, r *http.Request) {
 	token := chi.URLParam(r, "token")
 	err := app.repo.Users.Activate(token)

@@ -25,6 +25,7 @@ type User struct {
 	IsActive  bool      `json:"is_active"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	RoleID    int       `json:"role_id"`
 }
 
 type password struct {
@@ -53,7 +54,7 @@ func (r *UsersRepo) GetById(id int64) (*User, error) {
 	defer cancel()
 
 	query := `
-		select id, email, username, password, created_at, updated_at 
+		select id, role_id, email, username, password, created_at, updated_at 
 		from users
 		where id = $1
 		and is_active = true
@@ -61,6 +62,7 @@ func (r *UsersRepo) GetById(id int64) (*User, error) {
 	user := User{}
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
 		&user.ID,
+		&user.RoleID,
 		&user.Email,
 		&user.Username,
 		&user.Password.hash,
@@ -83,7 +85,7 @@ func (r *UsersRepo) GetByEmail(email string) (*User, error) {
 	defer cancel()
 
 	query := `
-		select id, email, username, password, created_at, updated_at 
+		select id, role_id, email, username, password, created_at, updated_at 
 		from users
 		where email = $1
 		and is_active = true
@@ -91,6 +93,7 @@ func (r *UsersRepo) GetByEmail(email string) (*User, error) {
 	user := User{}
 	err := r.db.QueryRowContext(ctx, query, email).Scan(
 		&user.ID,
+		&user.RoleID,
 		&user.Email,
 		&user.Username,
 		&user.Password.hash,
@@ -130,14 +133,15 @@ func (r *UsersRepo) create(user *User, tx *sql.Tx) error {
 	defer cancel()
 
 	query := `
-		insert into users(username, password, email) 
-		values($1, $2, $3) returning id, created_at, updated_at
+		insert into users(username, password, email, role_id) 
+		values($1, $2, $3, $4) returning id, created_at, updated_at
 	`
 
 	err := tx.QueryRowContext(ctx, query,
 		&user.Username,
 		&user.Password.hash,
 		&user.Email,
+		&user.RoleID,
 	).Scan(
 		&user.ID,
 		&user.CreatedAt,

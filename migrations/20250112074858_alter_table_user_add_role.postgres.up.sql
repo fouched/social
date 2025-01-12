@@ -1,0 +1,1 @@
+alter table users add column role_id integer not null default 1 references roles(id)

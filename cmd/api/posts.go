@@ -184,7 +184,7 @@ func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		string	true	"ID"
-//	@Success		204	{object}	repo.Post
+//	@Success		204	{object}
 //	@Failure		500	{object}	error	"Server Error"
 //	@Security		ApiKeyAuth
 //	@Router			/posts/{id} [delete]

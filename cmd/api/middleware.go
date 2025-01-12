@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/fouched/social/internal/repo"
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"strconv"
@@ -12,7 +13,6 @@ import (
 )
 
 func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//read auth header
 		authHeader := r.Header.Get("Authorization")
@@ -52,7 +52,7 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// BasicAuthMiddleware returning a func seems overly complex, let's see...
+// BasicAuthMiddleware applies basic authentication to a route
 func (app *application) BasicAuthMiddleware() func(handler http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -90,4 +90,39 @@ func (app *application) BasicAuthMiddleware() func(handler http.Handler) http.Ha
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func (app *application) checkPostOwnership(requiredRole string, next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user := getUserFromContext(r)
+		post := getPostFromContext(r)
+
+		//check if it is the user's post
+		if post.UserID == user.ID {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		//check role precedence
+		isAllowed, err := app.checkRolePrecedence(user, requiredRole)
+		if err != nil {
+			app.internalServerError(w, r, err)
+		}
+
+		if !isAllowed {
+			app.forbidden(w, r)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (app *application) checkRolePrecedence(user *repo.User, roleName string) (bool, error) {
+	role, err := app.repo.Roles.GetByName(roleName)
+	if err != nil {
+		return false, err
+	}
+
+	return user.Role.Level >= role.Level, nil
 }

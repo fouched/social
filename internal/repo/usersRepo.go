@@ -26,6 +26,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	RoleID    int       `json:"role_id"`
+	Role      Role      `json:"role"`
 }
 
 type password struct {
@@ -54,10 +55,12 @@ func (r *UsersRepo) GetById(id int64) (*User, error) {
 	defer cancel()
 
 	query := `
-		select id, role_id, email, username, password, created_at, updated_at 
-		from users
-		where id = $1
-		and is_active = true
+		select u.id, u.role_id, u.email, u.username, u.password, u.created_at, u.updated_at,
+			r.id, r.name, r.level, r.description
+		from users u
+			join roles r on (u.role_id = r.id)
+		where u.id = $1
+		and u.is_active = true
 	`
 	user := User{}
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
@@ -68,6 +71,10 @@ func (r *UsersRepo) GetById(id int64) (*User, error) {
 		&user.Password.hash,
 		&user.CreatedAt,
 		&user.UpdatedAt,
+		&user.Role.ID,
+		&user.Role.Name,
+		&user.Role.Level,
+		&user.Role.Description,
 	)
 	if err != nil {
 		switch {
@@ -85,10 +92,12 @@ func (r *UsersRepo) GetByEmail(email string) (*User, error) {
 	defer cancel()
 
 	query := `
-		select id, role_id, email, username, password, created_at, updated_at 
-		from users
-		where email = $1
-		and is_active = true
+		select u.id, u.role_id, u.email, u.username, u.password, u.created_at, u.updated_at,
+			r.id, r.name, r.level, r.description
+		from users u
+			join roles r on (u.role_id = r.id)
+		where u.email = $1
+		and u.is_active = true
 	`
 	user := User{}
 	err := r.db.QueryRowContext(ctx, query, email).Scan(
@@ -99,6 +108,10 @@ func (r *UsersRepo) GetByEmail(email string) (*User, error) {
 		&user.Password.hash,
 		&user.CreatedAt,
 		&user.UpdatedAt,
+		&user.Role.ID,
+		&user.Role.Name,
+		&user.Role.Level,
+		&user.Role.Description,
 	)
 	if err != nil {
 		switch {

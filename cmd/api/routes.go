@@ -57,8 +57,8 @@ func (app *application) routes() http.Handler {
 				r.Use(app.postsContextMiddleware)
 
 				r.Get("/", app.getPost)
-				r.Patch("/", app.updatePost)
-				r.Delete("/", app.deletePost)
+				r.Patch("/", app.checkPostOwnership("moderator", app.updatePost))
+				r.Delete("/", app.checkPostOwnership("admin", app.deletePost))
 
 				r.Post("/comment", app.createPostComment)
 			})

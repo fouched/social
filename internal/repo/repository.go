@@ -39,6 +39,9 @@ type Repository struct {
 		Follow(userID, followerID int64) error
 		Unfollow(userID, followerID int64) error
 	}
+	Roles interface {
+		GetByName(string) (*Role, error)
+	}
 }
 
 func NewRepository(db *sql.DB) Repository {
@@ -48,6 +51,7 @@ func NewRepository(db *sql.DB) Repository {
 		Users:     &UsersRepo{db},
 		UserSeed:  &UserSeedRepo{db},
 		Followers: &FollowersRepo{db},
+		Roles:     &RolesRepo{db},
 	}
 }
 

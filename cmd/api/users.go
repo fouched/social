@@ -129,6 +129,7 @@ func (app *application) activateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserFromContext(r *http.Request) *repo.User {
+	// populated by middleware.go > AuthTokenMiddleware
 	user, _ := r.Context().Value(userCtx).(*repo.User)
 	return user
 }

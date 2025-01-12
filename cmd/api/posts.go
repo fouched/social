@@ -37,15 +37,13 @@ const postCtx postKey = "post"
 //	@Tags			posts
 //	@Accept			json
 //	@Produce		json
-//	@Param			title	query		string	true	"Title"
-//	@Param			content	query		string	true	"Content"
-//	@Param			tags	query		string	true	"Tags (comma separated)"
-//	@Success		200		{object}	repo.Post
-//	@Failure		400		{object}	error	"Bad Request"
-//	@Failure		404		{object}	error	"Not found"
-//	@Failure		500		{object}	error	"Server Error"
+//	@Param			payload	body		CreatePostPayload	true	"Post payload"
+//	@Success		201		{object}	repo.Post
+//	@Failure		400		{object}	error
+//	@Failure		401		{object}	error
+//	@Failure		500		{object}	error
 //	@Security		ApiKeyAuth
-//	@Router			/posts/ [post]
+//	@Router			/posts [post]
 func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
 	var payload CreatePostPayload
 	if err := readJSON(w, r, &payload); err != nil {
@@ -60,14 +58,14 @@ func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
 
 	user := getUserFromContext(r)
 
-	post := repo.Post{
+	post := &repo.Post{
 		Title:   payload.Title,
 		Content: payload.Content,
 		Tags:    payload.Tags,
 		UserID:  user.ID,
 	}
 
-	if err := app.repo.Posts.Create(&post); err != nil {
+	if err := app.repo.Posts.Create(post); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
@@ -113,10 +111,8 @@ func (app *application) getPost(w http.ResponseWriter, r *http.Request) {
 //	@Tags			posts
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		string	true	"ID"
-//	@Param			title	query		string	true	"Title"
-//	@Param			content	query		string	true	"Content"
-//	@Param			tags	query		string	true	"Tags (comma separated)"
+//	@Param			id		path		int					true	"Post ID"
+//	@Param			payload	body		UpdatePostPayload	true	"Post payload"
 //	@Success		200		{object}	repo.Post
 //	@Failure		400		{object}	error	"Bad Request"
 //	@Failure		404		{object}	error	"Not found"
@@ -183,8 +179,8 @@ func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 //	@Tags			posts
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		string	true	"ID"
-//	@Success		204	{object}
+//	@Param			id	path	string	true	"ID"
+//	@Success		204
 //	@Failure		500	{object}	error	"Server Error"
 //	@Security		ApiKeyAuth
 //	@Router			/posts/{id} [delete]

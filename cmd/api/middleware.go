@@ -93,7 +93,7 @@ func (app *application) BasicAuthMiddleware() func(handler http.Handler) http.Ha
 }
 
 func (app *application) checkPostOwnership(requiredRole string, next http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		user := getUserFromContext(r)
 		post := getPostFromContext(r)
 
@@ -115,7 +115,7 @@ func (app *application) checkPostOwnership(requiredRole string, next http.Handle
 		}
 
 		next.ServeHTTP(w, r)
-	})
+	}
 }
 
 func (app *application) checkRolePrecedence(user *repo.User, roleName string) (bool, error) {

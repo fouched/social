@@ -12,4 +12,4 @@ insert into roles (name, description, level)
 values ('moderator', 'update other users posts', 2);
 
 insert into roles (name, description, level)
-values ('admin', 'update and delete other users posts', 2);
+values ('admin', 'update and delete other users posts', 3);

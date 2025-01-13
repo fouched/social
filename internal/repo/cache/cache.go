@@ -5,15 +5,15 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type Repository struct {
+type Cache struct {
 	Users interface {
 		Get(int64) (*repo.User, error)
 		Set(*repo.User) error
 	}
 }
 
-func NewRedisRepository(rdb *redis.Client) Repository {
-	return Repository{
+func NewRedisCache(rdb *redis.Client) Cache {
+	return Cache{
 		Users: &UsersCache{rdb: rdb},
 	}
 }

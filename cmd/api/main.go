@@ -77,11 +77,11 @@ func main() {
 	logger.Info("DB connected")
 
 	//cache
-	var redisDB *redis.Client
-	var cacheRepository cache.Repository
+	var redisDriver *redis.Client
+	var cacheInstance cache.Cache
 	if cfg.redis.enabled {
-		redisDB = cache.NewRedisClient(cfg.redis.addr, cfg.redis.pw, cfg.redis.db)
-		cacheRepository = cache.NewRedisRepository(redisDB)
+		redisDriver = cache.NewRedisClient(cfg.redis.addr, cfg.redis.pw, cfg.redis.db)
+		cacheInstance = cache.NewRedisCache(redisDriver)
 		logger.Info("Redis cache connected")
 	}
 
@@ -100,7 +100,7 @@ func main() {
 	app := &application{
 		config:        cfg,
 		repo:          repository,
-		cacheRepo:     cacheRepository,
+		cacheRepo:     cacheInstance,
 		logger:        logger,
 		mailer:        mailerImpl,
 		authenticator: jwtAuthenticator,

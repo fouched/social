@@ -4,6 +4,7 @@ import (
 	"github.com/fouched/social/internal/auth"
 	"github.com/fouched/social/internal/mailer"
 	"github.com/fouched/social/internal/repo"
+	"github.com/fouched/social/internal/repo/cache"
 	"go.uber.org/zap"
 	"time"
 )
@@ -11,6 +12,7 @@ import (
 type application struct {
 	config        config
 	repo          repo.Repository
+	cacheRepo     cache.Repository
 	logger        *zap.SugaredLogger
 	mailer        mailer.Client
 	authenticator auth.Authenticator //abstract authentication mechanism so that we can easily use another
@@ -21,10 +23,18 @@ type config struct {
 	db          dbConfig
 	mail        mailConfig
 	auth        authConfig
+	redis       redisConfig
 	env         string
 	apiURL      string
 	mailer      mailer.Client
 	frontendURL string
+}
+
+type redisConfig struct {
+	addr    string
+	pw      string
+	db      int
+	enabled bool
 }
 
 type mailConfig struct {
@@ -55,7 +65,7 @@ type authConfig struct {
 
 type basicConfig struct {
 	user string
-	pass string
+	pw   string
 }
 
 type tokenConfig struct {

@@ -8,6 +8,8 @@ import (
 	"github.com/fouched/social/internal/driver"
 	"github.com/fouched/social/internal/mailer"
 	"github.com/fouched/social/internal/repo"
+	"github.com/fouched/social/internal/repo/cache"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"net/http"
 	"time"
@@ -47,10 +49,14 @@ func main() {
 	flag.StringVar(&cfg.mail.fromEmail, "fromEmail", "fouche@limehouse.co.za", "From email")
 	flag.StringVar(&cfg.mail.sendgrid.apiKey, "sendgridApiKey", "", "SendGrid API Key")
 	flag.StringVar(&cfg.auth.basic.user, "basicAuthUser", "admin", "Basic auth user")
-	flag.StringVar(&cfg.auth.basic.pass, "basicAuthPass", "admin", "Basic auth pass")
+	flag.StringVar(&cfg.auth.basic.pw, "basicAuthPass", "admin", "Basic auth password")
 	flag.StringVar(&cfg.auth.token.secret, "tokenSecret", "example", "Token secret")
 	flag.DurationVar(&cfg.auth.token.exp, "tokenExpiry", time.Hour*24*3, "Token expiry duration")
 	flag.StringVar(&cfg.auth.token.issuer, "tokenIssuer", "gophersocial", "Token issuer")
+	flag.StringVar(&cfg.redis.addr, "redisAddr", "localhost:6379", "Redis address")
+	flag.StringVar(&cfg.redis.pw, "redisPwd", "", "Redis Password")
+	flag.IntVar(&cfg.redis.db, "redisDB", 0, "Redis DB")
+	flag.BoolVar(&cfg.redis.enabled, "redisEnabled", false, "Redis enabled")
 
 	// Logger
 	logger := zap.Must(zap.NewProduction()).Sugar()
@@ -70,6 +76,15 @@ func main() {
 	defer dbPool.Close()
 	logger.Info("DB connected")
 
+	//cache
+	var redisDB *redis.Client
+	var cacheRepository cache.Repository
+	if cfg.redis.enabled {
+		redisDB = cache.NewRedisClient(cfg.redis.addr, cfg.redis.pw, cfg.redis.db)
+		cacheRepository = cache.NewRedisRepository(redisDB)
+		logger.Info("Redis cache connected")
+	}
+
 	repository := repo.NewRepository(dbPool)
 
 	//seed(repository)
@@ -85,6 +100,7 @@ func main() {
 	app := &application{
 		config:        cfg,
 		repo:          repository,
+		cacheRepo:     cacheRepository,
 		logger:        logger,
 		mailer:        mailerImpl,
 		authenticator: jwtAuthenticator,

@@ -79,7 +79,7 @@ func (app *application) BasicAuthMiddleware() func(handler http.Handler) http.Ha
 
 			//check credentials
 			username := app.config.auth.basic.user
-			pass := app.config.auth.basic.pass
+			pass := app.config.auth.basic.pw
 
 			credentials := strings.SplitN(string(decoded), ":", 2)
 			if len(credentials) != 2 || credentials[0] != username || credentials[1] != pass {

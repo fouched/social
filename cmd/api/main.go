@@ -77,11 +77,11 @@ func main() {
 	logger.Info("DB connected")
 
 	//cache
-	var redisDriver *redis.Client
+	var cacheDriver *redis.Client
 	var cacheInstance cache.Cache
 	if cfg.redis.enabled {
-		redisDriver = cache.NewRedisClient(cfg.redis.addr, cfg.redis.pw, cfg.redis.db)
-		cacheInstance = cache.NewRedisCache(redisDriver)
+		cacheDriver = cache.NewRedisClient(cfg.redis.addr, cfg.redis.pw, cfg.redis.db)
+		cacheInstance = cache.NewRedisCache(cacheDriver)
 		logger.Info("Redis cache connected")
 	}
 

@@ -436,7 +436,9 @@ func generateUsers(num int) []*repo.User {
 		users[i] = &repo.User{
 			Username: userName,
 			Email:    userName + "@" + domainNames[rand.Intn(len(domainNames))],
-			RoleID:   1,
+			Role: repo.Role{
+				Name: "user",
+			},
 			//Password: "password",
 		}
 	}

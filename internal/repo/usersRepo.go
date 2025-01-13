@@ -147,14 +147,21 @@ func (r *UsersRepo) create(user *User, tx *sql.Tx) error {
 
 	query := `
 		insert into users(username, password, email, role_id) 
-		values($1, $2, $3, $4) returning id, created_at, updated_at
+		values($1, $2, $3, (select id from roles where name = $4)) 
+		returning id, created_at, updated_at
 	`
+
+	// user default if role not specified
+	role := user.Role.Name
+	if role == "" {
+		role = "user"
+	}
 
 	err := tx.QueryRowContext(ctx, query,
 		&user.Username,
 		&user.Password.hash,
 		&user.Email,
-		&user.RoleID,
+		role,
 	).Scan(
 		&user.ID,
 		&user.CreatedAt,

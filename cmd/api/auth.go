@@ -56,6 +56,9 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 	user := &repo.User{
 		Username: payload.Username,
 		Email:    payload.Email,
+		Role: repo.Role{
+			Name: "user",
+		},
 	}
 	if err := user.Password.Set(payload.Password); err != nil {
 		app.internalServerError(w, r, err)

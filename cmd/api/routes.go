@@ -36,7 +36,9 @@ func (app *application) routes() http.Handler {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Route("/v1", func(r chi.Router) {
-		r.With(app.BasicAuthMiddleware()).Get("/health", app.healthCheckHandler)
+		// removed basic auth - was just for learning
+		//r.With(app.BasicAuthMiddleware()).Get("/health", app.healthCheckHandler)
+		r.Get("/health", app.healthCheckHandler)
 
 		// Public routes
 		r.Route("/authentication", func(r chi.Router) {

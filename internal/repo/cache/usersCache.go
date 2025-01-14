@@ -45,12 +45,12 @@ func (c *UsersCache) Set(user *repo.User) error {
 	defer cancel()
 
 	cacheKey := fmt.Sprintf("user-%d", user.ID)
-	json, err := json.Marshal(user)
+	jsonUser, err := json.Marshal(user)
 	if err != nil {
 		return err
 	}
 
-	return c.rdb.SetEx(ctx, cacheKey, json, UserExpTime).Err()
+	return c.rdb.SetEx(ctx, cacheKey, jsonUser, UserExpTime).Err()
 }
 
 func (c *UsersCache) Delete(userID int64) {

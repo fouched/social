@@ -52,3 +52,11 @@ func (c *UsersCache) Set(user *repo.User) error {
 
 	return c.rdb.SetEx(ctx, cacheKey, json, UserExpTime).Err()
 }
+
+func (c *UsersCache) Delete(userID int64) {
+	ctx, cancel := context.WithTimeout(context.Background(), cacheTimeout)
+	defer cancel()
+
+	cacheKey := fmt.Sprintf("user-%d", userID)
+	c.rdb.Del(ctx, cacheKey)
+}

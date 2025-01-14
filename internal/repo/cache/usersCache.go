@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/fouched/social/internal/repo"
 	"github.com/redis/go-redis/v9"
@@ -21,7 +22,10 @@ func (c *UsersCache) Get(id int64) (*repo.User, error) {
 
 	cacheKey := fmt.Sprintf("user-%d", id)
 	data, err := c.rdb.Get(ctx, cacheKey).Result()
-	if err != nil {
+	if errors.Is(err, redis.Nil) {
+		// not in cache yet
+		return nil, nil
+	} else if err != nil {
 		return nil, err
 	}
 

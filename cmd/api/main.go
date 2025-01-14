@@ -56,7 +56,7 @@ func main() {
 	flag.StringVar(&cfg.redis.addr, "redisAddr", "localhost:6379", "Redis address")
 	flag.StringVar(&cfg.redis.pw, "redisPwd", "", "Redis Password")
 	flag.IntVar(&cfg.redis.db, "redisDB", 0, "Redis DB")
-	flag.BoolVar(&cfg.redis.enabled, "redisEnabled", false, "Redis enabled")
+	flag.BoolVar(&cfg.redis.enabled, "redisEnabled", true, "Redis enabled")
 
 	// Logger
 	logger := zap.Must(zap.NewProduction()).Sugar()

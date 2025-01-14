@@ -41,7 +41,7 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		user, err := app.repo.Users.GetById(userID)
+		user, err := app.getUserByID(userID)
 		if err != nil {
 			app.unauthorized(w, r, err)
 			return
@@ -125,4 +125,33 @@ func (app *application) checkRolePrecedence(user *repo.User, roleName string) (b
 	}
 
 	return user.Role.Level >= role.Level, nil
+}
+
+func (app *application) getUserByID(userID int64) (*repo.User, error) {
+
+	if !app.config.redis.enabled {
+		//app.logger.Info("cache disabled")
+		return app.repo.Users.GetById(userID)
+	}
+
+	//app.logger.Infow("trying cache", "key", "user", "id", userID)
+	user, err := app.cacheRepo.Users.Get(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// user not in cache get from db and cache it
+	if user == nil {
+		//app.logger.Infow("fetch from db", "id", userID)
+		user, err = app.repo.Users.GetById(userID)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := app.cacheRepo.Users.Set(user); err != nil {
+			return nil, err
+		}
+	}
+
+	return user, nil
 }

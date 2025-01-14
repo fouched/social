@@ -130,7 +130,8 @@ func (app *application) run(mux http.Handler) error {
 		IdleTimeout:  time.Minute,
 	}
 
-	// do a graceful shutdown - useful for docker swarm / k8s environments
+	// do a graceful shutdown - give the server 5 secs to finish what it is doing
+	// useful for docker swarm / k8s environments
 	shutdown := make(chan error)
 	go func() {
 		quit := make(chan os.Signal, 1)

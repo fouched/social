@@ -12,7 +12,7 @@ import (
 type application struct {
 	config        config
 	repo          repo.Repository
-	cacheRepo     cache.Cache
+	cache         cache.Cache
 	logger        *zap.SugaredLogger
 	mailer        mailer.Client
 	authenticator auth.Authenticator //abstract authentication mechanism so that we can easily use another

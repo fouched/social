@@ -135,7 +135,7 @@ func (app *application) getUserByID(userID int64) (*repo.User, error) {
 	}
 
 	//app.logger.Infow("trying cache", "key", "user", "id", userID)
-	user, err := app.cacheRepo.Users.Get(userID)
+	user, err := app.cache.Users.Get(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (app *application) getUserByID(userID int64) (*repo.User, error) {
 			return nil, err
 		}
 
-		if err := app.cacheRepo.Users.Set(user); err != nil {
+		if err := app.cache.Users.Set(user); err != nil {
 			return nil, err
 		}
 	}

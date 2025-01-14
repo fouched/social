@@ -12,7 +12,7 @@ type Cache struct {
 	Users interface {
 		Get(int64) (*repo.User, error)
 		Set(*repo.User) error
-		Delete(int65 int64)
+		Delete(id int64)
 	}
 }
 

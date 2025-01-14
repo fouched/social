@@ -100,7 +100,7 @@ func main() {
 	app := &application{
 		config:        cfg,
 		repo:          repository,
-		cacheRepo:     cacheInstance,
+		cache:         cacheInstance,
 		logger:        logger,
 		mailer:        mailerImpl,
 		authenticator: jwtAuthenticator,

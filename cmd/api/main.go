@@ -130,7 +130,7 @@ func (app *application) run(mux http.Handler) error {
 		IdleTimeout:  time.Minute,
 	}
 
-	// do a graceful shutdown - give the server 10 seconds to finish what it is doing
+	// do a graceful shutdown - give the server up to 5 seconds to finish what it is doing
 	// useful for docker swarm / k8s environments
 	shutdown := make(chan error)
 	go func() {
@@ -139,7 +139,7 @@ func (app *application) run(mux http.Handler) error {
 		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 		s := <-quit
 
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
 		app.logger.Infow("signal caught", "signal", s.String())
